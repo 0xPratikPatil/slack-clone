@@ -1,0 +1,141 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @map("_id")
+  name          String
+  email         String
+  emailVerified Boolean
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+  username      String?
+  role          String?
+  banned        Boolean?
+  banReason     String?
+  banExpires    Int?
+  Session       Session[]
+  Account       Account[]
+  Passkey       Passkey[]
+
+  twoFactorEnabled Boolean?
+
+  Invitation Invitation[]
+  TwoFactor  TwoFactor[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id @map("_id")
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  activeOrganizationId String?
+
+  @@map("session")
+}
+
+model Account {
+  id           String    @id @map("_id")
+  accountId    String
+  providerId   String
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  expiresAt    DateTime?
+  password     String?
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  @@map("verification")
+}
+
+model Passkey {
+  id             String    @id @map("_id")
+  name           String?
+  publicKey      String
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webauthnUserID String
+  counter        Int
+  deviceType     String
+  backedUp       Boolean
+  transports     String?
+  createdAt      DateTime?
+
+  @@map("passkey")
+}
+
+model Organization {
+  id        String   @id @map("_id")
+  name      String
+  slug      String?
+  logo      String?
+  createdAt DateTime
+  metadata  String?
+
+  Member     Member[]
+  Invitation Invitation[]
+
+  @@unique([slug])
+  @@map("organization")
+}
+
+model Member {
+  id             String       @id @map("_id")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  email          String
+  role           String
+  createdAt      DateTime
+
+  @@map("member")
+}
+
+model Invitation {
+  id             String       @id @map("_id")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
+}
+
+model TwoFactor {
+  id          String @id @map("_id")
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
