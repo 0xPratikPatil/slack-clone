@@ -6,13 +6,12 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
-	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
-import { client } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,7 +27,7 @@ export default function ResetPassword() {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setError("");
-		const res = await client.resetPassword({
+		const res = await authClient.resetPassword({
 			newPassword: password,
 		});
 		if (res.error) {

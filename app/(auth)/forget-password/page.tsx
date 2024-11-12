@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { client } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { AlertCircle, ArrowLeft, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -29,7 +29,7 @@ export default function Component() {
 		setError("");
 
 		try {
-			const res = await client.forgetPassword({
+			await authClient.forgetPassword({
 				email,
 				redirectTo: "/reset-password",
 			});

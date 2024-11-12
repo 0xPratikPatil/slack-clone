@@ -3,8 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Space_Grotesk } from "next/font/google"
-
-import { WrapperWithQuery } from "@/components/wrapper";
+import { QueryProviders } from "@/components/query-provider";
 import { cn } from "@/lib/utils";
 
 
@@ -23,7 +22,9 @@ export default function RootLayout({
 			<body className={cn(sg.className, "antialiased min-h-screen")}
 			>
 				<ThemeProvider attribute="class" defaultTheme="dark">
-					<WrapperWithQuery>{children}</WrapperWithQuery>
+					<QueryProviders>
+						{children}
+					</QueryProviders>
 					<Toaster richColors />
 				</ThemeProvider>
 			</body>
