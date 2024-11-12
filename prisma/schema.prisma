@@ -9,42 +9,44 @@ datasource db {
 }
 
 model User {
-  id            String    @id @map("_id")
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  username      String?
-  role          String?
-  banned        Boolean?
-  banReason     String?
-  banExpires    Int?
-  Session       Session[]
-  Account       Account[]
-  Passkey       Passkey[]
-
+  id               String    @id @map("_id")
+  name             String
+  email            String
+  emailVerified    Boolean
+  image            String?
+  createdAt        DateTime
+  updatedAt        DateTime
   twoFactorEnabled Boolean?
-
-  Invitation Invitation[]
-  TwoFactor  TwoFactor[]
+  username         String?
+  role             String?
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
+  timezone         String?
+  language         String?
+  urls             String[]
+  pronouns         String?
+  bio              String?
 
   @@unique([email])
   @@unique([username])
   @@map("user")
+  Session Session[]
+  Account Account[]
+  Invitation Invitation[]
+  TwoFactor TwoFactor[]
+  Passkey Passkey[]
 }
 
 model Session {
-  id             String   @id @map("_id")
-  expiresAt      DateTime
-  ipAddress      String?
-  userAgent      String?
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  impersonatedBy String?
-
+  id                   String   @id @map("_id")
+  expiresAt            DateTime
+  ipAddress            String?
+  userAgent            String?
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeOrganizationId String?
+  impersonatedBy       String?
 
   @@map("session")
 }
@@ -73,22 +75,6 @@ model Verification {
   @@map("verification")
 }
 
-model Passkey {
-  id             String    @id @map("_id")
-  name           String?
-  publicKey      String
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  webauthnUserID String
-  counter        Int
-  deviceType     String
-  backedUp       Boolean
-  transports     String?
-  createdAt      DateTime?
-
-  @@map("passkey")
-}
-
 model Organization {
   id        String   @id @map("_id")
   name      String
@@ -97,11 +83,10 @@ model Organization {
   createdAt DateTime
   metadata  String?
 
-  Member     Member[]
-  Invitation Invitation[]
-
   @@unique([slug])
   @@map("organization")
+  Member Member[]
+  Invitation Invitation[]
 }
 
 model Member {
@@ -109,7 +94,6 @@ model Member {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   userId         String
-  email          String
   role           String
   createdAt      DateTime
 
@@ -138,4 +122,20 @@ model TwoFactor {
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("twoFactor")
+}
+
+model Passkey {
+  id             String    @id @map("_id")
+  name           String?
+  publicKey      String
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webauthnUserID String
+  counter        Int
+  deviceType     String
+  backedUp       Boolean
+  transports     String?
+  createdAt      DateTime?
+
+  @@map("passkey")
 }
