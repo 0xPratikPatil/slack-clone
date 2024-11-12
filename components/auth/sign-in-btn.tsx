@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/auth";
+import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 
 export async function SignInButton() {

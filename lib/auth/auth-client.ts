@@ -8,8 +8,10 @@ import {
   multiSessionClient,
 } from "better-auth/client/plugins";
 import { toast } from "sonner";
+import { inferAdditionalFields } from "better-auth/client/plugins";
+import { auth } from "./auth";
 
-export const client = createAuthClient({
+export const authClient = createAuthClient({
   plugins: [
     organizationClient(),
     twoFactorClient({
@@ -20,7 +22,7 @@ export const client = createAuthClient({
     adminClient(),
     usernameClient(),
     multiSessionClient(),
-  ],
+    inferAdditionalFields<typeof auth>()  ],
   fetchOptions: {
     onError(e) {
       if (e.error.status === 429) {
@@ -35,8 +37,7 @@ export const {
   signIn,
   signOut,
   useSession,
-  user,
   organization,
   useListOrganizations,
   useActiveOrganization,
-} = client;
+} = authClient;

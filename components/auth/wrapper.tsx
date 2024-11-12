@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Logo } from "./logo";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Button } from "./ui/button";
+import { Logo } from "../logo";
+import { Button } from "../ui/button";
 import { usePathname } from 'next/navigation';
 
 export function Wrapper(props: { children: React.ReactNode }) {
@@ -20,25 +19,16 @@ export function Wrapper(props: { children: React.ReactNode }) {
 						<p className="dark:text-white text-black">LOTUS</p>
 					</div>
 				</Link>
-				<div className="z-50 flex items-center gap-3">
+				{/* <div className="z-50 flex items-center gap-3">
 					<Button asChild >
 						<Link href={isLoginIn ? "/register" : "/login"}>
 							{isLoginIn ? "Register" : "Login"}
 						</Link>
 					</Button>
-				</div>
+				</div> */}
 			</div>
 			<div className="mt-24 2xl:mt-40 lg:w-7/12 w-full">{props.children}</div>
 		</div>
 	);
 }
 
-const queryClient = new QueryClient();
-
-export function WrapperWithQuery(props: { children: React.ReactNode }) {
-	return (
-		<QueryClientProvider client={queryClient}>
-			{props.children}
-		</QueryClientProvider>
-	);
-}

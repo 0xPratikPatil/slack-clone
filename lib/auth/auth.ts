@@ -10,14 +10,18 @@ import {
 } from "better-auth/plugins";
 import { reactInvitationEmail } from "@/components/email/invitation";
 import { reactResetPasswordEmail } from "@/components/email/rest-password";
-import { resend } from "./resend";
+import { resend } from "../resend";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { db } from "@/lib/db";
+import db from "@/lib/db";
+import { additionalUserFields } from "./additional-fields";
 
 export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "mongodb",
   }),
+  user: {
+    additionalFields: additionalUserFields,
+  },
   emailVerification: {
     async sendVerificationEmail(user, url) {
       await resend.emails.send({
@@ -89,7 +93,7 @@ export const auth = betterAuth({
     bearer(),
     admin(),
     multiSession({
-      maximumSessions: 1
+      maximumSessions: 1,
     }),
   ],
 });

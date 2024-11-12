@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
-import { signIn } from "@/lib/auth-client";
+import { signIn } from "@/lib/auth/auth-client";
 import { Key, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

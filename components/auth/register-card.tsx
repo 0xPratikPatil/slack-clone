@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useState } from "react";
-import { signUp } from "@/lib/auth-client";
+import { signUp } from "@/lib/auth/auth-client";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -108,7 +108,7 @@ export function RegisterCard() {
                     toast.error(ctx.error.message);
                   },
                   onSuccess: () => {
-                    router.push("/profile");
+                    router.push("/dashboard");
                   },
                 }
               );
