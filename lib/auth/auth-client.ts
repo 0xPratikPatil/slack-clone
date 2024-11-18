@@ -22,7 +22,8 @@ export const authClient = createAuthClient({
     adminClient(),
     usernameClient(),
     multiSessionClient(),
-    inferAdditionalFields<typeof auth>()  ],
+    inferAdditionalFields<typeof auth>(),
+  ],
   fetchOptions: {
     onError(e) {
       if (e.error.status === 429) {

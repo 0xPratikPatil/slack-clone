@@ -16,6 +16,8 @@ import db from "@/lib/db";
 import { additionalUserFields } from "./additional-fields";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL!,
+  // trustedOrigins:process.env.BETTER_AUTH_TRUSTED_ORIGINS!,
   database: prismaAdapter(db, {
     provider: "mongodb",
   }),
@@ -32,6 +34,7 @@ export const auth = betterAuth({
       });
     },
     sendOnSignUp: true,
+    requireEmailVerification: true,
   },
   emailAndPassword: {
     enabled: true,
@@ -96,4 +99,11 @@ export const auth = betterAuth({
       maximumSessions: 1,
     }),
   ],
+  advanced: {
+    cookiePrefix: process.env.APP_NAME!,
+    // crossSubDomainCookies:{
+    //   enabled:true,
+    //   domain:process.env.BETTER_AUTH_TRUSTED_ORIGINS!
+    // }
+  },
 });
