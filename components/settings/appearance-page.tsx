@@ -8,7 +8,7 @@ import { ShadcnThemes } from "@prisma/client";
 import { useThemeApplier } from "@/hooks/use-theme-applier";
 import { ThemeGenerator } from "@/components/ui/theme-generator";
 import { generateCSSCode } from "@/lib/copy-code/generators";
-import { ThemeGeneratorProperties } from "../ui/theme-generator-properties";
+import { ThemeGeneratorProperties } from "@/components/ui/theme-generator-properties";
 
 const appearanceFormSchema = z.object({
   theme: z.enum(["light", "dark"], {

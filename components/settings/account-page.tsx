@@ -49,7 +49,7 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth/auth-client";
 import { Session } from "@/types/auth";
 import { Loader2 } from "lucide-react";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { updateAccount } from "@/features/settings/api/update-account";
 import { redirect } from "next/navigation";
 

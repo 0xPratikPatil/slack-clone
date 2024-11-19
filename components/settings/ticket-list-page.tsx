@@ -22,6 +22,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 // Mock data for tickets
 const tickets = [
@@ -31,6 +39,7 @@ const tickets = [
     category: "Technical",
     status: "Open",
     createdAt: "2023-05-01",
+    priority: "High",
   },
   {
     id: 2,
@@ -38,6 +47,7 @@ const tickets = [
     category: "Billing",
     status: "Closed",
     createdAt: "2023-05-02",
+    priority: "High",
   },
   {
     id: 3,
@@ -45,6 +55,7 @@ const tickets = [
     category: "Feature",
     status: "In Progress",
     createdAt: "2023-05-03",
+    priority: "High",
   },
   {
     id: 4,
@@ -52,6 +63,7 @@ const tickets = [
     category: "Other",
     status: "Open",
     createdAt: "2023-05-04",
+    priority: "High",
   },
   {
     id: 5,
@@ -59,6 +71,7 @@ const tickets = [
     category: "Technical",
     status: "In Progress",
     createdAt: "2023-05-05",
+    priority: "High",
   },
 ];
 
@@ -84,7 +97,7 @@ const TicketListPage = () => {
       <div>
         <h3 className="text-lg font-medium">Support</h3>
         <p className="text-sm text-muted-foreground">
-          When agents have problems,they open suport tickets.
+          When agents have problems,they open support tickets.
         </p>
       </div>
       <Separator />
@@ -113,42 +126,81 @@ const TicketListPage = () => {
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Subject</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Created At</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {filteredTickets.map((ticket) => (
-            <TableRow key={ticket.id}>
-              <TableCell>{ticket.id}</TableCell>
-              <TableCell>{ticket.subject}</TableCell>
-              <TableCell>{ticket.category}</TableCell>
-              <TableCell>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>Subject</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead>Action</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredTickets.map((ticket) => (
+              <TableRow key={ticket.id}>
+                <TableCell>{ticket.id}</TableCell>
+                <TableCell>{ticket.subject}</TableCell>
+                <TableCell>{ticket.category}</TableCell>
+                <TableCell>
+                  <Badge
+                    className={
+                      statusColors[ticket.status as keyof typeof statusColors]
+                    }
+                  >
+                    {ticket.status}
+                  </Badge>
+                </TableCell>
+                <TableCell>{ticket.priority}</TableCell>
+                <TableCell>{ticket.createdAt}</TableCell>
+                <TableCell>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/ticket/${ticket.id}`}>View</Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* New grid layout for mobile devices */}
+      <div className="md:hidden grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredTickets.map((ticket) => (
+          <Card key={ticket.id}>
+            <CardHeader>
+              <CardTitle>{ticket.subject}</CardTitle>
+              <CardDescription>Created on {ticket.createdAt}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-between items-center">
                 <Badge
-                  className={
-                    statusColors[ticket.status as keyof typeof statusColors]
+                  variant={
+                    ticket.status === "Open"
+                      ? "destructive"
+                      : ticket.status === "In Progress"
+                      ? "default"
+                      : "secondary"
                   }
                 >
                   {ticket.status}
                 </Badge>
-              </TableCell>
-              <TableCell>{ticket.createdAt}</TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/ticket/${ticket.id}`}>View</Link>
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                <span className="text-sm text-gray-500">
+                  Priority: {ticket.priority}
+                </span>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">
+                View Details
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
 
       {filteredTickets.length === 0 && (
         <div className="text-center py-4">

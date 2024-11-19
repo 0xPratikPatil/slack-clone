@@ -43,7 +43,7 @@ import { Session } from "@/types/auth";
 import { useState } from "react";
 import { redirect, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
-import { Separator } from "../ui/separator";
+import { Separator } from "@/components/ui/separator";
 import { updateProfile } from "@/features/settings/api/update-profile";
 
 const SettingsProfilePage = ({ session }: { session: Session }) => {

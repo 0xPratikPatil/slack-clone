@@ -645,22 +645,20 @@ const DangerZone = () => {
                   <AlertTriangle className="h-5 w-5" />
                   Delete Account
                 </DialogTitle>
-                <DialogDescription className="space-y-4">
-                  <div className="rounded-lg p-4 text-sm">
-                    <h3 className="mb-2 font-medium text-red-900">
-                      This action will:
-                    </h3>
-                    <ul className="list-inside space-y-2 text-red-800">
-                      <li>• Permanently delete your entire account.</li>
-                      <li>• Immediately erase all your data.</li>
-                      <li>• Remove access to all services and features.</li>
-                      <li>• Delete all saved preferences and settings.</li>
-                    </ul>
-                    <p className="mt-4 font-medium text-red-900">
-                      This action cannot be reversed or undone.
-                    </p>
-                  </div>
-                </DialogDescription>
+                <div className="text-sm space-y-4">
+                  <h3 className="mb-2 font-medium text-red-900">
+                    This action will:
+                  </h3>
+                  <ul className="list-inside space-y-2 text-red-800">
+                    <li>• Permanently delete your entire account.</li>
+                    <li>• Immediately erase all your data.</li>
+                    <li>• Remove access to all services and features.</li>
+                    <li>• Delete all saved preferences and settings.</li>
+                  </ul>
+                  <p className="mt-4 font-medium text-red-900">
+                    This action cannot be reversed or undone.
+                  </p>
+                </div>
               </DialogHeader>
               <DialogFooter className="sm:justify-start">
                 <div className="flex w-full gap-2">
