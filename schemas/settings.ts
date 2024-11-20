@@ -97,21 +97,21 @@ export const submitTicketFormSchema = z.object({
   message: z.string().min(10, {
     message: "Message must be at least 10 characters.",
   }),
-  attachments: z
-    .custom<FileList>()
-    .refine((files) => files.length <= 3, "You can upload up to 3 files.")
-    .refine(
-      (files) => Array.from(files).every((file) => file.size <= MAX_FILE_SIZE),
-      `Each file size should be less than 5MB.`
-    )
-    .refine(
-      (files) =>
-        Array.from(files).every((file) =>
-          ACCEPTED_FILE_TYPES.includes(file.type)
-        ),
-      "Only .jpg, .jpeg, .png, .pdf, .doc and .docx formats are supported."
-    )
-    .optional(),
+  // attachments: z
+  //   .custom<FileList>()
+  //   .refine((files) => files.length <= 3, "You can upload up to 3 files.")
+  //   .refine(
+  //     (files) => Array.from(files).every((file) => file.size <= MAX_FILE_SIZE),
+  //     `Each file size should be less than 5MB.`
+  //   )
+  //   .refine(
+  //     (files) =>
+  //       Array.from(files).every((file) =>
+  //         ACCEPTED_FILE_TYPES.includes(file.type)
+  //       ),
+  //     "Only .jpg, .jpeg, .png, .pdf, .doc and .docx formats are supported."
+  //   )
+  //   .optional(),
   priority: z.string({
     required_error: "Please select a priority.",
   }),
