@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id               String    @id @map("_id")
+  id               String       @id @map("_id")
   name             String
   email            String
   emailVerified    Boolean
@@ -27,16 +26,16 @@ model User {
   urls             String[]
   pronouns         String?
   bio              String?
+  Session          Session[]
+  Account          Account[]
+  Invitation       Invitation[]
+  TwoFactor        TwoFactor[]
+  Passkey          Passkey[]
+  Ticket           Ticket[]
 
   @@unique([email])
   @@unique([username])
   @@map("user")
-  Session Session[]
-  Account Account[]
-  Invitation Invitation[]
-  TwoFactor TwoFactor[]
-  Passkey Passkey[]
-  Ticket Ticket[]
 }
 
 model Session {
@@ -68,26 +67,27 @@ model Account {
 }
 
 model Verification {
-  id         String   @id @map("_id")
+  id         String    @id @map("_id")
   identifier String
   value      String
   expiresAt  DateTime
+  createdAt  DateTime?
 
   @@map("verification")
 }
 
 model Organization {
-  id        String   @id @map("_id")
-  name      String
-  slug      String?
-  logo      String?
-  createdAt DateTime
-  metadata  String?
+  id         String       @id @map("_id")
+  name       String
+  slug       String?
+  logo       String?
+  createdAt  DateTime
+  metadata   String?
+  Member     Member[]
+  Invitation Invitation[]
 
   @@unique([slug])
   @@map("organization")
-  Member Member[]
-  Invitation Invitation[]
 }
 
 model Member {
@@ -142,17 +142,17 @@ model Passkey {
 }
 
 model Ticket {
-  id          String   @id @map("_id") @default(auto()) @db.ObjectId
-  userId      String
-  category    String
-  priority    String   // New field for ticket priority
-  subject     String
-  message     String
-  attachments Json?   // Store file names or URLs as JSON
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category  String
+  priority  String // New field for ticket priority
+  subject   String
+  message   String
+  status    String
+  // attachments Json?   // Store file names or URLs as JSON
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("ticket")
 }
