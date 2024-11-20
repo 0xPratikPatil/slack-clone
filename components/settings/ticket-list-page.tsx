@@ -30,74 +30,60 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import { Session } from "@/types/auth";
+import { Ticket } from "@prisma/client";
 
-// Mock data for tickets
-const tickets = [
-  {
-    id: 1,
-    subject: "Login issues",
-    category: "Technical",
-    status: "Open",
-    createdAt: "2023-05-01",
-    priority: "High",
-  },
-  {
-    id: 2,
-    subject: "Billing question",
-    category: "Billing",
-    status: "Closed",
-    createdAt: "2023-05-02",
-    priority: "High",
-  },
-  {
-    id: 3,
-    subject: "Feature request",
-    category: "Feature",
-    status: "In Progress",
-    createdAt: "2023-05-03",
-    priority: "High",
-  },
-  {
-    id: 4,
-    subject: "Account deletion",
-    category: "Other",
-    status: "Open",
-    createdAt: "2023-05-04",
-    priority: "High",
-  },
-  {
-    id: 5,
-    subject: "Performance issues",
-    category: "Technical",
-    status: "In Progress",
-    createdAt: "2023-05-05",
-    priority: "High",
-  },
-];
+interface TicketListPageProps {
+  session: Session;
+  tickets: Ticket[] | null;
+  error?: string | null;
+}
+
 
 const statusColors = {
   Open: "bg-yellow-500",
   "In Progress": "bg-blue-500",
   Closed: "bg-green-500",
-};
+} as const;
 
-const TicketListPage = () => {
+const TicketListPage: React.FC<TicketListPageProps> = ({ 
+  session, 
+  tickets = [], 
+  error 
+}) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = React.useState("");
   const [categoryFilter, setCategoryFilter] = React.useState("all");
 
-  const filteredTickets = tickets.filter(
-    (ticket) =>
-      ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (categoryFilter === "all" || ticket.category === categoryFilter)
-  );
+  // Get unique categories from actual tickets
+  const categories = React.useMemo(() => {
+    if (!tickets) return [];
+    return Array.from(new Set(tickets.map(ticket => ticket.category)));
+  }, [tickets]);
+
+  const filteredTickets = React.useMemo(() => {
+    if (!tickets) return [];
+    return tickets.filter(
+      (ticket) =>
+        ticket.subject.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (categoryFilter === "all" || ticket.category === categoryFilter)
+    );
+  }, [tickets, searchTerm, categoryFilter]);
+
+  if (error) {
+    return (
+      <div className="rounded-lg bg-red-50 p-4">
+        <p className="text-red-800">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-medium">Support</h3>
         <p className="text-sm text-muted-foreground">
-          When agents have problems,they open support tickets.
+          When agents have problems, they open support tickets.
         </p>
       </div>
       <Separator />
@@ -115,10 +101,11 @@ const TicketListPage = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
-            <SelectItem value="Technical">Technical</SelectItem>
-            <SelectItem value="Billing">Billing</SelectItem>
-            <SelectItem value="Feature">Feature</SelectItem>
-            <SelectItem value="Other">Other</SelectItem>
+            {categories.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button onClick={() => router.push("/submit-ticket")}>
@@ -130,7 +117,7 @@ const TicketListPage = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
+              {/* <TableHead>ID</TableHead> */}
               <TableHead>Subject</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Status</TableHead>
@@ -142,7 +129,7 @@ const TicketListPage = () => {
           <TableBody>
             {filteredTickets.map((ticket) => (
               <TableRow key={ticket.id}>
-                <TableCell>{ticket.id}</TableCell>
+                {/* <TableCell>{ticket.id}</TableCell> */}
                 <TableCell>{ticket.subject}</TableCell>
                 <TableCell>{ticket.category}</TableCell>
                 <TableCell>
@@ -155,7 +142,9 @@ const TicketListPage = () => {
                   </Badge>
                 </TableCell>
                 <TableCell>{ticket.priority}</TableCell>
-                <TableCell>{ticket.createdAt}</TableCell>
+                <TableCell>
+                  {new Date(ticket.createdAt).toLocaleDateString()}
+                </TableCell>
                 <TableCell>
                   <Button variant="outline" size="sm" asChild>
                     <Link href={`/ticket/${ticket.id}`}>View</Link>
@@ -167,13 +156,15 @@ const TicketListPage = () => {
         </Table>
       </div>
 
-      {/* New grid layout for mobile devices */}
+      {/* Mobile view */}
       <div className="md:hidden grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredTickets.map((ticket) => (
           <Card key={ticket.id}>
             <CardHeader>
               <CardTitle>{ticket.subject}</CardTitle>
-              <CardDescription>Created on {ticket.createdAt}</CardDescription>
+              <CardDescription>
+                Created on {new Date(ticket.createdAt).toLocaleDateString()}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex justify-between items-center">
@@ -194,7 +185,11 @@ const TicketListPage = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full" 
+                onClick={() => router.push(`/ticket/${ticket.id}`)}
+              >
                 View Details
               </Button>
             </CardFooter>

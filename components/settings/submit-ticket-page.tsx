@@ -32,10 +32,11 @@ import {
 } from "@/schemas/settings";
 import { Session } from "@/types/auth";
 import { redirect } from "next/navigation";
+import { submitTicket } from "@/features/support/api/submit-ticket";
 
 const SubmitTicketPage = ({ session }: { session: Session }) => {
   if (!session) redirect("/login");
-
+  const { mutate } = submitTicket();
   const form = useForm<z.infer<typeof submitTicketFormSchema>>({
     resolver: zodResolver(submitTicketFormSchema),
     defaultValues: {
@@ -47,7 +48,9 @@ const SubmitTicketPage = ({ session }: { session: Session }) => {
 
   const [fileNames, setFileNames] = React.useState<string[]>([]);
 
-  const onSubmit = (values: z.infer<typeof submitTicketFormSchema>) => {};
+  const onSubmit = (values: z.infer<typeof submitTicketFormSchema>) => {
+    mutate({ json: values });
+  };
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">
