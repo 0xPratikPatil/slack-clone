@@ -3,6 +3,9 @@ import { handle } from "hono/vercel";
 import { auth } from "@/lib/auth/auth";
 import { Session } from "@/types/auth";
 import settingsRoute from "@/features/settings/server/route";
+import supportRoute from "@/features/support/server/route";
+import { cors } from "hono/cors";
+import { trustedOrigins } from "@/constants/trustedOrigins";
 
 const app = new Hono<{
   Variables: {
@@ -11,9 +14,15 @@ const app = new Hono<{
   };
 }>().basePath("/api");
 
+app.use(
+  cors({
+    origin: trustedOrigins,
+    credentials: true,
+  })
+);
+
 app.use("*", async (c, next) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
-
   if (!session) {
     c.set("user", null);
     c.set("session", null);
@@ -29,7 +38,9 @@ app.on(["POST", "GET"], "/auth/**", (c) => {
   return auth.handler(c.req.raw);
 });
 
-const routes = app.route("/settings", settingsRoute);
+const routes = app
+  .route("/settings", settingsRoute)
+  .route("/support", supportRoute);
 
 export const GET = handle(app);
 export const POST = handle(app);
