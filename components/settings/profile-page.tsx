@@ -294,7 +294,7 @@ const EditAvatar = () => {
                 image: image ? await convertImageToBase64(image) : undefined,
                 fetchOptions: {
                   onSuccess: () => {
-                    toast.success("User updated successfully");
+                    toast.success("User profile updated successfully");
                   },
                   onError: (error: string | any) => {
                     toast.error(error.error.message);
@@ -312,6 +312,34 @@ const EditAvatar = () => {
               <Loader2 size={15} className="animate-spin" />
             ) : (
               "Update"
+            )}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={async () => {
+              setIsLoading(true);
+              await authClient.updateUser({
+                image: undefined,
+                fetchOptions: {
+                  onSuccess: () => {
+                    toast.success("Avatar removed successfully");
+                  },
+                  onError: (error: string | any) => {
+                    toast.error(error.error.message);
+                  },
+                },
+              });
+              router.refresh();
+              setImage(null);
+              setImagePreview(null);
+              setIsLoading(false);
+              setOpen(false);
+            }}
+          >
+            {isLoading ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              "Remove Avatar"
             )}
           </Button>
         </DialogFooter>
