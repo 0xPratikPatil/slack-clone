@@ -2,7 +2,6 @@ import { getSession } from "@/components/auth/get-session";
 import { redirect } from "next/navigation";
 import TicketListPage from "@/components/settings/ticket-list-page";
 import { useFetchTicket } from "@/features/support/api/use-fetch-tickets";
-import { Ticket } from "@prisma/client";
 
 const TicketsPage = async () => {
   const session = await getSession();

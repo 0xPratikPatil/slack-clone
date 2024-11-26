@@ -4,7 +4,6 @@ import { accountFormSchema, profileFormSchema } from "@/schemas/settings";
 import db from "@/lib/db";
 import { Session } from "@/types/auth";
 import APIResponse from "@/helper/apiResponse";
-import appearanceRoute from "@/features/settings/appearance/server/route";
 
 const app = new Hono<{
   Variables: {
@@ -62,7 +61,6 @@ const app = new Hono<{
       );
     }
   })
-  .route("/appearance", appearanceRoute)
   .post(
     "/security",
     // zValidator("json", securityFormSchema),

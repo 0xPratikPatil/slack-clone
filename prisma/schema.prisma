@@ -26,12 +26,12 @@ model User {
   urls             String[]
   pronouns         String?
   bio              String?
-  Passkey          Passkey[]
-  TwoFactor        TwoFactor[]
-  Invitation       Invitation[]
-  Member           Member[]
-  Account          Account[]
   Session          Session[]
+  Account          Account[]
+  Member           Member[]
+  Invitation       Invitation[]
+  TwoFactor        TwoFactor[]
+  Passkey          Passkey[]
   Ticket           Ticket[]
 
   @@unique([email])
@@ -93,8 +93,8 @@ model Organization {
   logo       String?
   createdAt  DateTime
   metadata   String?
-  Invitation Invitation[]
   Member     Member[]
+  Invitation Invitation[]
 
   @@unique([slug])
   @@map("organization")
