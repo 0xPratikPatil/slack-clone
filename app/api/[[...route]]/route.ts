@@ -4,6 +4,12 @@ import { auth } from "@/lib/auth/auth";
 import { Session } from "@/types/auth";
 import settingsRoute from "@/features/settings/server/route";
 import supportRoute from "@/features/support/server/route";
+import channelsRoute from "@/features/channels/server/route";
+import conversationsRoute from "@/features/conversations/server/route";
+import memebersRoute from "@/features/members/server/route";
+import messagesRoute from "@/features/messages/server/route";
+import reactionsRoute from "@/features/reactions/server/route";
+import workspacesRoute from "@/features/workspaces/server/route";
 import { cors } from "hono/cors";
 import { trustedOrigins } from "@/constants/trustedOrigins";
 
@@ -40,7 +46,13 @@ app.on(["POST", "GET"], "/auth/**", (c) => {
 
 const routes = app
   .route("/settings", settingsRoute)
-  .route("/support", supportRoute);
+  .route("/support", supportRoute)
+  .route("/workspaces", workspacesRoute)
+  .route("/channels", channelsRoute)
+  .route("members", memebersRoute)
+  .route("/reactions", reactionsRoute)
+  .route("/conversations", conversationsRoute)
+  .route("/messages", messagesRoute);
 
 export const GET = handle(app);
 export const POST = handle(app);
