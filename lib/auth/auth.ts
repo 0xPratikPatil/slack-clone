@@ -10,12 +10,15 @@ import {
 } from "better-auth/plugins";
 import { reactInvitationEmail } from "@/components/email/invitation";
 import { reactResetPasswordEmail } from "@/components/email/rest-password";
-import { resend } from "../resend";
+import { resend } from "@/lib/resend";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import db from "@/lib/db";
-import { additionalUserFields } from "./additional-fields";
+import { additionalUserFields } from "@/lib/auth/additional-fields";
+import { trustedOrigins } from "@/constants/trustedOrigins";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL!,
+  trustedOrigins: trustedOrigins,
   database: prismaAdapter(db, {
     provider: "mongodb",
   }),
@@ -32,6 +35,7 @@ export const auth = betterAuth({
       });
     },
     sendOnSignUp: true,
+    requireEmailVerification: true,
   },
   emailAndPassword: {
     enabled: true,
@@ -96,4 +100,11 @@ export const auth = betterAuth({
       maximumSessions: 1,
     }),
   ],
+  advanced: {
+    cookiePrefix: process.env.APP_NAME!,
+    // crossSubDomainCookies:{
+    //   enabled:true,
+    //   domain:process.env.BETTER_AUTH_TRUSTED_ORIGINS!
+    // }
+  },
 });
