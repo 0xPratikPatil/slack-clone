@@ -47,7 +47,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 
 const SettingsSecurityPage = (props: {
-  session: Session | null;
+  session: Session;
   activeSessions: Session["session"][];
 }) => {
   const session = props.session;
@@ -687,7 +687,13 @@ const DangerZone = () => {
   );
 };
 
-const SessionButton = ({ sessionId, currentSessionId, authClient }: any) => {
+const SessionButton = ({
+  sessionId,
+  currentSessionId,
+}: {
+  sessionId: string;
+  currentSessionId: string;
+}) => {
   const router = useRouter();
   const [isTerminating, setIsTerminating] = React.useState(false);
   const [isSigningOut, setIsSigningOut] = React.useState(false);
@@ -699,8 +705,8 @@ const SessionButton = ({ sessionId, currentSessionId, authClient }: any) => {
     await authClient.signOut({
       fetchOptions: {
         onSuccess() {
-          redirect("/");
           toast.success("You've successfully signed out.");
+          redirect("/");
         },
       },
     });
@@ -710,7 +716,7 @@ const SessionButton = ({ sessionId, currentSessionId, authClient }: any) => {
   const handleRevokeSession = async () => {
     setIsTerminating(true);
     const res = await authClient.revokeSession({
-      id: sessionId,
+      token: sessionId,
     });
 
     if (res.error) {
@@ -914,7 +920,7 @@ const ActiveSession = ({
   currentSession,
 }: {
   session: Session["session"];
-  currentSession: Session | null;
+  currentSession: Session;
 }) => {
   const [location, setLocation] = useState<{
     city: string;
@@ -1002,8 +1008,7 @@ const ActiveSession = ({
         ) : null}
         <SessionButton
           sessionId={session.id}
-          currentSessionId={currentSession?.session.id}
-          authClient={authClient}
+          currentSessionId={currentSession.session.id}
         />
       </div>
     </div>
