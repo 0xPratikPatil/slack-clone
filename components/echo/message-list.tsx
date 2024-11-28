@@ -1,14 +1,15 @@
-import { differenceInMinutes, format, isToday, isYesterday } from 'date-fns';
-import { Loader } from 'lucide-react';
-import { useState } from 'react';
+import { differenceInMinutes, format, isToday, isYesterday } from "date-fns";
+import { Loader } from "lucide-react";
+import { useState } from "react";
 
-import { useGetCurrentMember } from '@/features/members/api/use-current-member';
-import type { GetMessagesReturnType } from '@/features/messages/api/use-get-messages';
-import { useWorkspaceId } from '@/hooks/use-workspace-id';
+import { useGetCurrentMember } from "@/features/members/api/use-current-member";
+import type { useGetMessages } from "@/features/messages/api/use-get-messages";
+import { useWorkspaceId } from "@/hooks/use-workspace-id";
 
-import { ChannelHero } from './channel-hero';
-import { ConversationHero } from './conversation-hero';
-import { Message } from './message';
+import { ChannelHero } from "./channel-hero";
+import { ConversationHero } from "./conversation-hero";
+import { Message } from "./message";
+import { EchoMessage } from "@prisma/client";
 
 const TIME_THRESHOLD = 5;
 
@@ -17,8 +18,8 @@ interface MessageListProps {
   memberImage?: string;
   channelName?: string;
   channelCreationTime?: number;
-  variant?: 'channel' | 'thread' | 'conversation';
-  data: GetMessagesReturnType | undefined;
+  variant?: "channel" | "thread" | "conversation";
+  data: ReturnType<typeof useGetMessages>["messages"];
   loadMore: () => void;
   isLoadingMore: boolean;
   canLoadMore: boolean;
@@ -27,10 +28,10 @@ interface MessageListProps {
 const formatDateLabel = (dateStr: string) => {
   const date = new Date(dateStr);
 
-  if (isToday(date)) return 'Today';
-  if (isYesterday(date)) return 'Yesterday';
+  if (isToday(date)) return "Today";
+  if (isYesterday(date)) return "Yesterday";
 
-  return format(date, 'EEEE, MMMM d');
+  return format(date, "EEEE, MMMM d");
 };
 
 export const MessageList = ({
@@ -39,7 +40,7 @@ export const MessageList = ({
   channelName,
   channelCreationTime,
   data,
-  variant = 'channel',
+  variant = "channel",
   loadMore,
   isLoadingMore,
   canLoadMore,
@@ -50,21 +51,18 @@ export const MessageList = ({
 
   const { data: currentMember } = useGetCurrentMember({ workspaceId });
 
-  const groupedMessages = data?.reduce(
-    (groups, message) => {
-      const date = new Date(message.createdAt);
-      const dateKey = format(date, 'yyyy-MM-dd');
+  const groupedMessages = data?.reduce((groups, message) => {
+    const date = new Date(message.createdAt);
+    const dateKey = format(date, "yyyy-MM-dd");
 
-      if (!groups[dateKey]) {
-        groups[dateKey] = [];
-      }
+    if (!groups[dateKey]) {
+      groups[dateKey] = [];
+    }
 
-      groups[dateKey].unshift(message);
+    groups[dateKey].unshift(message);
 
-      return groups;
-    },
-    {} as Record<string, typeof data>,
-  );
+    return groups;
+  }, {} as Record<string, typeof data>);
 
   return (
     <div className="messages-scrollbar flex flex-1 flex-col-reverse overflow-y-auto pb-4">
@@ -82,13 +80,16 @@ export const MessageList = ({
             const prevMessage = messages[i - 1];
             const isCompact =
               prevMessage &&
-              prevMessage.user._id === message.user._id &&
-              differenceInMinutes(new Date(message._creationTime), new Date(prevMessage._creationTime)) < TIME_THRESHOLD;
+              prevMessage.memberId === message.memberId &&
+              differenceInMinutes(
+                new Date(message.updatedAt),
+                new Date(prevMessage.updatedAt)
+              ) < TIME_THRESHOLD;
 
             return (
               <Message
-                key={message._id}
-                id={message._id}
+                key={message.id}
+                id={message.id}
                 memberId={message.memberId}
                 authorImage={message.user.image}
                 authorName={message.user.name}
@@ -102,10 +103,10 @@ export const MessageList = ({
                 threadImage={message.threadImage}
                 threadName={message.threadName}
                 threadTimestamp={message.threadTimestamp}
-                isEditing={editingId === message._id}
+                isEditing={editingId === message.id}
                 setEditingId={setEditingId}
                 isCompact={isCompact}
-                hideThreadButton={variant === 'thread'}
+                hideThreadButton={variant === "thread"}
               />
             );
           })}
@@ -120,7 +121,7 @@ export const MessageList = ({
               ([entry]) => {
                 if (entry.isIntersecting && canLoadMore) loadMore();
               },
-              { threshold: 1.0 },
+              { threshold: 1.0 }
             );
 
             observer.observe(el);
@@ -140,8 +141,12 @@ export const MessageList = ({
         </div>
       )}
 
-      {variant === 'channel' && channelName && channelCreationTime && <ChannelHero name={channelName} creationTime={channelCreationTime} />}
-      {variant === 'conversation' && <ConversationHero name={memberName} image={memberImage} />}
+      {variant === "channel" && channelName && channelCreationTime && (
+        <ChannelHero name={channelName} creationTime={channelCreationTime} />
+      )}
+      {variant === "conversation" && (
+        <ConversationHero name={memberName} image={memberImage} />
+      )}
     </div>
   );
 };
