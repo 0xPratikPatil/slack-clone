@@ -1,0 +1,254 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String          @id @map("_id")
+  name             String
+  email            String
+  emailVerified    Boolean
+  image            String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  twoFactorEnabled Boolean?
+  username         String?
+  role             String?
+  banned           Boolean?
+  banReason        String?
+  banExpires       DateTime?
+  timezone         String?
+  language         String?
+  urls             String[]
+  pronouns         String?
+  bio              String?
+  EchoWorkspace    EchoWorkspace[] @relation("UserWorkspaces")
+  EchoMember       EchoMember[]
+  Passkey          Passkey[]
+  TwoFactor        TwoFactor[]
+  Invitation       Invitation[]
+  Member           Member[]
+  Account          Account[]
+  Session          Session[]
+
+  @@unique([email])
+  @@unique([username])
+  @@map("user")
+}
+
+model Session {
+  id                   String   @id @map("_id")
+  expiresAt            DateTime
+  token                String
+  createdAt            DateTime
+  updatedAt            DateTime
+  ipAddress            String?
+  userAgent            String?
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activeOrganizationId String?
+  impersonatedBy       String?
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @map("_id")
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Organization {
+  id         String       @id @map("_id")
+  name       String
+  slug       String?
+  logo       String?
+  createdAt  DateTime
+  metadata   String?
+  Invitation Invitation[]
+  Member     Member[]
+
+  @@unique([slug])
+  @@map("organization")
+}
+
+model Member {
+  id             String       @id @map("_id")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String
+  createdAt      DateTime
+
+  @@map("member")
+}
+
+model Invitation {
+  id             String       @id @map("_id")
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
+}
+
+model TwoFactor {
+  id          String @id @map("_id")
+  secret      String
+  backupCodes String
+  userId      String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("twoFactor")
+}
+
+model Passkey {
+  id             String    @id @map("_id")
+  name           String?
+  publicKey      String
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  webauthnUserID String
+  counter        Int
+  deviceType     String
+  backedUp       Boolean
+  transports     String?
+  createdAt      DateTime?
+
+  @@map("passkey")
+}
+
+model EchoWorkspace {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  userId        String
+  joinCode      String
+  user          User               @relation("UserWorkspaces", fields: [userId], references: [id])
+  members       EchoMember[]
+  channels      EchoChannel[]
+  conversations EchoConversation[]
+  messages      EchoMessage[]
+  reactions     EchoReaction[]
+}
+
+model EchoMember {
+  id                     String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String
+  workspaceId            String             @db.ObjectId
+  role                   EchoRole           @default(member)
+  user                   User               @relation(fields: [userId], references: [id])
+  workspace              EchoWorkspace      @relation(fields: [workspaceId], references: [id])
+  messages               EchoMessage[]
+  reactions              EchoReaction[]
+  memberOneConversations EchoConversation[] @relation("MemberOne")
+  memberTwoConversations EchoConversation[] @relation("MemberTwo")
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([workspaceId, userId])
+}
+
+model EchoChannel {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  workspaceId String        @db.ObjectId
+  workspace   EchoWorkspace @relation(fields: [workspaceId], references: [id])
+  messages    EchoMessage[]
+
+  @@index([workspaceId])
+}
+
+model EchoConversation {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  workspaceId String        @db.ObjectId
+  memberOneId String        @db.ObjectId
+  memberTwoId String        @db.ObjectId
+  workspace   EchoWorkspace @relation(fields: [workspaceId], references: [id])
+  memberOne   EchoMember    @relation("MemberOne", fields: [memberOneId], references: [id])
+  memberTwo   EchoMember    @relation("MemberTwo", fields: [memberTwoId], references: [id])
+  messages    EchoMessage[]
+
+  @@index([workspaceId])
+}
+
+model EchoMessage {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  body            String
+  image           String?           @db.ObjectId
+  memberId        String            @db.ObjectId
+  workspaceId     String            @db.ObjectId
+  channelId       String?           @db.ObjectId
+  parentMessageId String?           @db.ObjectId
+  conversationId  String?           @db.ObjectId
+  updatedAt       Float?
+  member          EchoMember        @relation(fields: [memberId], references: [id])
+  workspace       EchoWorkspace     @relation(fields: [workspaceId], references: [id])
+  channel         EchoChannel?      @relation(fields: [channelId], references: [id])
+  parentMessage   EchoMessage?      @relation("ParentChild", fields: [parentMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  childMessages   EchoMessage[]     @relation("ParentChild")
+  conversation    EchoConversation? @relation(fields: [conversationId], references: [id])
+  reactions       EchoReaction[]
+  createdAt       DateTime
+
+  @@index([workspaceId])
+  @@index([memberId])
+  @@index([channelId])
+  @@index([conversationId])
+  @@index([parentMessageId])
+  @@index([channelId, parentMessageId, conversationId])
+}
+
+model EchoReaction {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  workspaceId String        @db.ObjectId
+  messageId   String        @db.ObjectId
+  memberId    String        @db.ObjectId
+  value       String
+  workspace   EchoWorkspace @relation(fields: [workspaceId], references: [id])
+  message     EchoMessage   @relation(fields: [messageId], references: [id])
+  member      EchoMember    @relation(fields: [memberId], references: [id])
+
+  @@index([workspaceId])
+  @@index([messageId])
+  @@index([memberId])
+}
+
+enum EchoRole {
+  admin
+  member
+}
