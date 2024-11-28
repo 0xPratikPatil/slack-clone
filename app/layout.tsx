@@ -6,6 +6,7 @@ import { QueryProviders } from "@/components/query-provider";
 import { cn } from "@/lib/utils";
 import { JotaiProvider } from "@/components/jotai-provider";
 import { ModalProvider } from "@/components/modal-provider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const sg = Space_Grotesk({ subsets: ["latin"] });
 
@@ -24,8 +25,10 @@ export default function RootLayout({
           <QueryProviders>
             <JotaiProvider>
               <ModalProvider />
-              {children}
-              <Toaster richColors />
+              <NuqsAdapter>
+                {children}
+                <Toaster richColors />
+              </NuqsAdapter>
             </JotaiProvider>
           </QueryProviders>
         </ThemeProvider>
