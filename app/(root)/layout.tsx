@@ -16,7 +16,7 @@ const AppLayout = async ({
   if (!session) redirect("/login");
   return (
     <SidebarProvider>
-      <AppSidebar variant="floating" collapsible="icon" session={session} />
+      <AppSidebar variant="floating" collapsible="offcanvas" session={session} />
       <SidebarInset>
         <header className="flex h-16 items-center gap-2 p-4">
           <SidebarTrigger className="-ml-1" />
